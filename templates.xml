@@ -58,6 +58,9 @@
 
 				PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 			</OnClick>
+			<OnShow>
+				HHEColumnHeader_OnShow(self)
+			</OnShow>
 		</Scripts>
 		<ButtonText name="$parentText">
 			<Anchors>

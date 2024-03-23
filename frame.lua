@@ -119,6 +119,12 @@ function HandleSortClicked(columnKey)
     updateRenderedData()
 end
 
+function HHEColumnHeader_OnShow(self)
+    if not (self.sortType == sortKey) then
+        _G["HHEFrameColumnHeader" .. self.sortType .. "Arrow"]:Hide()
+    end
+end
+
 local function updateData()
     spellData = ParseSpellBook()
     sortData()
