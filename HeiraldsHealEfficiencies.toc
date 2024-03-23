@@ -1,0 +1,13 @@
+## Interface: 11500
+## Version: 1.0.0
+## Title: 1 Heiralds Heal Efficiencies
+## Notes: Shows you how efficient different healing spells are
+## Author: Heirald
+
+parse.lua
+sort.lua
+frame.lua
+
+templates.xml
+
+core.lua
