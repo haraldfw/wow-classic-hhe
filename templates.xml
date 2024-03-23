@@ -120,6 +120,7 @@
 				HHEFrame:SetScript("OnMouseDown", HHEFrame.StartMoving)
 				HHEFrame:SetScript("OnMouseUp", HHEFrame.StopMovingOrSizing)
 				HHEFrame:SetPoint("CENTER")
+				HHEFrame:SetWidth(HHETABLE_ROW_WIDTH+40)
 			</OnLoad>
 		</Scripts>
 		<Frames>
@@ -186,9 +187,22 @@
 					</OnLoad>
 				</Scripts>
 			</Button>
-			<Button name="HHEFrameColumnHeaderIsGroupHeal" inherits="HHEColumnHeaderTemplate" text="Grp">
+			<Button name="HHEFrameColumnHeaderHealPerSecond" inherits="HHEColumnHeaderTemplate" text="HPS">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="HHEFrameColumnHeaderEfficiency" relativePoint="RIGHT" x="-2" y="0"/>
+				</Anchors>
+				<Frames>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						self.sortType = "HealPerSecond"
+						HHEFrameColumn_SetWidth(self)
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="HHEFrameColumnHeaderIsGroupHeal" inherits="HHEColumnHeaderTemplate" text="Grp">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="HHEFrameColumnHeaderHealPerSecond" relativePoint="RIGHT" x="-2" y="0"/>
 				</Anchors>
 				<Frames>
 				</Frames>
@@ -215,18 +229,13 @@
 					</Layer>
 				</Layers>
 			</Frame>
-			<ScrollFrame name="HHEListScrollFrame" inherits="FauxScrollFrameTemplate">
+			<ScrollFrame name="HHEListScrollFrame" inherits="UIPanelScrollFrameTemplate">
 				<Size x="20" y="287"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="HHEFrameListInset" relativePoint="TOPLEFT" x="3" y="-3" />
 					<Anchor point="TOPRIGHT" relativeTo="HHEFrameListInset" relativePoint="TOPRIGHT" x="-27" y="-6"/>
 					<Anchor point="BOTTOMRIGHT" relativeTo="HHEFrameListInset" relativePoint="BOTTOMRIGHT" x="-27" y="3"/>
 				</Anchors>
-				<Scripts>
-					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(self, offset, FRIENDS_FRAME_WHO_HEIGHT, WhoList_Update);
-					</OnVerticalScroll>
-				</Scripts>
 				<Layers>
 					<Layer level="BACKGROUND">
 						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
@@ -245,6 +254,9 @@
 						</Texture>
 					</Layer>
 				</Layers>
+				<ScrollChild>
+					<Frame name="$parentScrollChildFrame" parentKey="ScrollChildFrame" />
+				</ScrollChild>
 			</ScrollFrame>
 		</Frames>
 	</Frame>

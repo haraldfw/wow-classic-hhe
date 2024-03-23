@@ -2,6 +2,7 @@ local sortKey = "Name"
 local sortAsc = true
 local spellData = {}
 
+local TEXT_CELL_PADDING = 3
 local CELL_HEIGHT = 20
 
 local cellInfos = {
@@ -13,7 +14,7 @@ local cellInfos = {
 	},
 	{
 		fieldName = "Name",
-		width = 150,
+		width = 175,
 		justifyH = "LEFT",
 	},
 	{
@@ -33,20 +34,23 @@ local cellInfos = {
 		justifyH = "RIGHT",
 	},
 	{
+		fieldName = "HealPerSecond",
+		width = 70,
+		justifyH = "RIGHT",
+	},
+	{
 		fieldName = "IsGroupHeal",
 		width = 50,
-		justifyH = "LEFT",
+		justifyH = "CENTER",
 	},
 }
 
-local ROW_WIDTH = 0
-
 local cellInfoMap = nil
 cellInfoMap = {}
-ROW_WIDTH = 0
+HHETABLE_ROW_WIDTH = 0
 for _, v in pairs(cellInfos) do
 	cellInfoMap[v.fieldName] = v
-	ROW_WIDTH = ROW_WIDTH + v.width
+	HHETABLE_ROW_WIDTH = HHETABLE_ROW_WIDTH + v.width
 end
 
 
@@ -65,7 +69,7 @@ end
 
 local function createRow(parent, data, offsetIndex)
 	local row = CreateFrame("Button", nil, parent)
-	row:SetSize(ROW_WIDTH, CELL_HEIGHT)
+	row:SetSize(HHETABLE_ROW_WIDTH, CELL_HEIGHT)
 	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -offsetIndex * CELL_HEIGHT)
 	row.columns = {}
 	local prevCell = nil
@@ -79,12 +83,12 @@ local function createRow(parent, data, offsetIndex)
 		else
 			cell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 			cell:ClearAllPoints()
-			cell:SetSize(cellInfo.width, CELL_HEIGHT)
+			cell:SetSize(cellInfo.width - TEXT_CELL_PADDING, CELL_HEIGHT)
 			cell:SetText(data[cellInfo.fieldName])
 			cell:SetJustifyH(cellInfo.justifyH)
 		end
 		if not (prevCell == nil) then
-			cell:SetPoint("TOPLEFT", prevCell, "TOPRIGHT")
+			cell:SetPoint("TOPLEFT", prevCell, "TOPRIGHT", TEXT_CELL_PADDING, 0)
 		else
 			cell:SetPoint("TOPLEFT", row, "TOPLEFT")
 		end
@@ -98,7 +102,7 @@ end
 
 local function updateRenderedData()
 	local child = HHEListScrollFrameScrollChildFrame
-	child:SetSize(ROW_WIDTH, CELL_HEIGHT * #spellData)
+	child:SetSize(HHETABLE_ROW_WIDTH, CELL_HEIGHT * #spellData)
 
 	if child.rows == nil then
 		child.rows = {}

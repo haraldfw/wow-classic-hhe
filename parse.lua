@@ -4,8 +4,8 @@ local function getAverageAsHOTSpell(desc)
 		return nil
 	end
 	return {
-		Average = value,
-		HOTSeconds = seconds,
+		Average = tonumber(value),
+		HOTSeconds = tonumber(seconds),
 	}
 end
 
@@ -41,7 +41,19 @@ local function getAverageAsPoM(desc)
 		return nil
 	end
 	return {
-		Average = value,
+		Average = tonumber(value),
+	}
+end
+
+local function getAverageAsPenance(desc)
+	local _, _, value, secInterval, forSeconds = string.find(desc,
+		"or (%d+) healing to an ally, instantly and every (%d+) sec for (%d+) sec.")
+	if value == nil then
+		return nil
+	end
+	return {
+		Average = tonumber(value) * (1 + tonumber(secInterval) * tonumber(forSeconds)),
+		ChanneledForSeconds = tonumber(forSeconds),
 	}
 end
 
@@ -49,18 +61,34 @@ local function toTruncNumber(val)
 	return tonumber(string.format("%.2f", val))
 end
 
+local function calcHPS(averageHeal, durations)
+	local highestDuration = 0;
+	for i = 1, #durations, 1 do
+		local value = durations[i]
+		if not (value == nil) and value > highestDuration then
+			highestDuration = value
+		end
+	end
+
+	if highestDuration == 0 then
+		return 0
+	end
+	return averageHeal / highestDuration
+end
+
 local parseFuncs = {
 	getAverageAsHOTSpell,
 	getAverageAsShieldSpell,
 	getAverageAsHealSpell,
 	getAverageAsPoM,
+	getAverageAsPenance,
 }
 
 local function parseSpell(spellID, playerMaxMana)
 	local desc = GetSpellDescription(spellID)
 	local avg
-	for _, parseFunc in ipairs(parseFuncs) do
-		avg = parseFunc(desc)
+	for i = 1, #parseFuncs, 1 do
+		avg = parseFuncs[i](desc)
 		if not (avg == nil) then
 			break
 		end
@@ -72,7 +100,8 @@ local function parseSpell(spellID, playerMaxMana)
 		}
 	end
 
-	local _, _, icon, castingTime, _, _, _ = GetSpellInfo(spellID)
+	local _, _, icon, castingTimeMS, _, _, _ = GetSpellInfo(spellID)
+	local castTime = castingTimeMS / 1000
 	local costObj = GetSpellPowerCost(spellID)[1]
 	local cost
 	if costObj == nil then
@@ -81,7 +110,7 @@ local function parseSpell(spellID, playerMaxMana)
 		if costObj.costPercent > 0 then
 			cost = (costObj.costPercent / 100) * playerMaxMana
 		elseif costObj.costPerSec > 0 then
-			cost = costObj.costPerSec * castingTime
+			cost = costObj.costPerSec * castTime
 		else
 			cost = costObj.cost
 		end
@@ -91,7 +120,7 @@ local function parseSpell(spellID, playerMaxMana)
 		end
 	end
 
-	local valueHealed = avg.Average
+	local valueHealed = tonumber(avg.Average)
 
 	local IsGroupHeal = string.match(desc, "party members") or string.match(desc, "party or raid member")
 	if IsGroupHeal then
@@ -103,16 +132,37 @@ local function parseSpell(spellID, playerMaxMana)
 	if cost > 0 then
 		efficiency = valueHealed / cost
 	end
+
+	local cooldownMS, globalCooldownMS = GetSpellBaseCooldown(spellID)
+	local cooldown = cooldownMS / 1000
+	local globalCooldown = globalCooldownMS / 1000
+
+	local healPerSecond;
+	if not (valueHealed == nil) and valueHealed > 0 then
+		healPerSecond = calcHPS(
+			valueHealed, {
+				avg.HOTSeconds,
+				avg.ChanneledForSeconds,
+				castTime,
+				cooldown,
+				globalCooldown,
+			})
+	end
+
 	return {
 		IsHealSpell = true,
 		SpellID = spellID,
 		Average = valueHealed and toTruncNumber(valueHealed) or 0,
 		HotSeconds = avg.HOTSeconds and toTruncNumber(avg.HOTSeconds) or 0,
+		ChanneledForSeconds = avg.ChanneledForSeconds and toTruncNumber(avg.ChanneledForSeconds) or 0,
 		IsGroupHeal = IsGroupHeal and "Yes" or "No",
-		CastingTime = castingTime and toTruncNumber(castingTime) or 0,
+		CastingTime = castTime and toTruncNumber(castTime) or 0,
 		Cost = cost and toTruncNumber(cost) or 0,
 		Icon = icon,
 		Efficiency = efficiency and toTruncNumber(efficiency) or 0,
+		Cooldown = cooldown,
+		GlobalCooldown = globalCooldown,
+		HealPerSecond = toTruncNumber(healPerSecond),
 	}
 end
 
