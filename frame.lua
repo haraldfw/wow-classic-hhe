@@ -45,8 +45,7 @@ local cellInfos = {
 	},
 }
 
-local cellInfoMap = nil
-cellInfoMap = {}
+local cellInfoMap = {}
 HHETABLE_ROW_WIDTH = 0
 for _, v in pairs(cellInfos) do
 	cellInfoMap[v.fieldName] = v
