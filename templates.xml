@@ -129,8 +129,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						HHEFrameColumn_SetWidth(self, 25)
 						self.sortType = "Icon"
+						HHEFrameColumn_SetWidth(self)
 					</OnLoad>
 				</Scripts>
 			</Button>
@@ -142,8 +142,8 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						HHEFrameColumn_SetWidth(self, 150)
 						self.sortType = "Name"
+						HHEFrameColumn_SetWidth(self)
 					</OnLoad>
 				</Scripts>
 			</Button>
@@ -155,8 +155,8 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						HHEFrameColumn_SetWidth(self, 50)
 						self.sortType = "Cost"
+						HHEFrameColumn_SetWidth(self)
 					</OnLoad>
 				</Scripts>
 			</Button>
@@ -168,8 +168,8 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						HHEFrameColumn_SetWidth(self, 70)
 						self.sortType = "Average"
+						HHEFrameColumn_SetWidth(self)
 					</OnLoad>
 				</Scripts>
 			</Button>
@@ -181,8 +181,8 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						HHEFrameColumn_SetWidth(self, 70)
 						self.sortType = "Efficiency"
+						HHEFrameColumn_SetWidth(self)
 					</OnLoad>
 				</Scripts>
 			</Button>
@@ -194,8 +194,8 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						HHEFrameColumn_SetWidth(self, 70)
 						self.sortType = "IsGroupHeal"
+						HHEFrameColumn_SetWidth(self)
 					</OnLoad>
 				</Scripts>
 			</Button>

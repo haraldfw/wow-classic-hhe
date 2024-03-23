@@ -7,67 +7,86 @@ local CELL_HEIGHT = 20
 local cellInfos = {
     {
         fieldName = "Icon",
-        width = 27,
+        width = CELL_HEIGHT,
         isIcon = true,
         justifyH = "LEFT",
     },
     {
         fieldName = "Name",
-        width = 152,
+        width = 150,
         justifyH = "LEFT",
     },
     {
         fieldName = "Cost",
-        width = 52,
+        width = 50,
         justifyH = "RIGHT",
     },
     {
         fieldName = "Average",
-        width = 72,
+        width = 70,
         justifyH = "RIGHT",
     },
     {
         fieldName = "Efficiency",
-        width = 52,
+        width = 70,
         formatDecimal = true,
         justifyH = "RIGHT",
     },
     {
         fieldName = "IsGroupHeal",
-        width = 52,
+        width = 50,
         justifyH = "LEFT",
     },
 }
 
+local cellInfoMap = nil
+if cellInfoMap == nil then
+    cellInfoMap = {}
+    for _, v in pairs(cellInfos) do
+        cellInfoMap[v.fieldName] = v
+    end
+end
+
+
 local function overwriteRow(row, data)
-    for i, cellInfo in pairs(cellInfos) do
+    local i = 0
+    for _, cellInfo in pairs(cellInfos) do
+        i = i + 1
         local cell = row.columns[i]
-        cell:SetText(data[cellInfo.fieldName])
+        if cellInfo.fieldName == "Icon" then
+            cell:SetTexture(data[cellInfo.fieldName])
+        else
+            cell:SetText(data[cellInfo.fieldName])
+        end
     end
 end
 
 local function createRow(parent, data, offsetIndex)
-    -- one row:
-    -- Icon | Spell Name + Rank | Amount healed average | Mana cost | Casting Time () | Healed per mana | Healing per second
     local row = CreateFrame("Button", nil, parent)
     row:SetSize(200, CELL_HEIGHT)
     row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -offsetIndex * CELL_HEIGHT)
     row.columns = {}
     local prevCell = nil
     for i, cellInfo in pairs(cellInfos) do
-        local cell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        cell:ClearAllPoints()
+        local cell;
+        if cellInfo.fieldName == "Icon" then
+            cell = row:CreateTexture(nil, "OVERLAY")
+            cell:SetSize(cellInfo.width, CELL_HEIGHT)
+            cell:SetTexture(data[cellInfo.fieldName])
+        else
+            cell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            cell:ClearAllPoints()
+            cell:SetSize(cellInfo.width, CELL_HEIGHT)
+            cell:SetText(data[cellInfo.fieldName])
+            cell:SetJustifyH(cellInfo.justifyH)
+        end
         if not (prevCell == nil) then
             cell:SetPoint("TOPLEFT", prevCell, "TOPRIGHT")
         else
             cell:SetPoint("TOPLEFT", row, "TOPLEFT")
         end
-        cell:SetSize(cellInfo.width, CELL_HEIGHT)
-        cell:SetText(data[cellInfo.fieldName])
-
         row.columns[i] = cell
         prevCell = cell
-        cell:SetJustifyH(cellInfo.justifyH)
         cell:Show()
     end
     return row
@@ -131,13 +150,18 @@ local function updateData()
     updateRenderedData()
 end
 
-function HHEFrameColumn_SetWidth(frame, width)
-    frame:SetWidth(width);
-    local name = frame:GetName() .. "Middle";
+function HHEFrameColumn_SetWidth(self)
+    local ci = cellInfoMap[self.sortType]
+    if not ci then
+        print("ERROR: missing cellInfo for sortType " .. self.sortType)
+        return nil
+    end
+    local name = self:GetName() .. "Middle";
     local middleFrame = _G[name];
     if middleFrame then
-        middleFrame:SetWidth(width - 9);
+        middleFrame:SetWidth(ci.width - 7);
     end
+    self:SetWidth(ci.width + 2);
 end
 
 function ShowHHEFrame()
