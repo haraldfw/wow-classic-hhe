@@ -49,17 +49,21 @@ local function toTruncNumber(val)
     return tonumber(string.format("%.2f", val))
 end
 
+local parseFuncs = {
+    getAverageAsHOTSpell,
+    getAverageAsShieldSpell,
+    getAverageAsHealSpell,
+    getAverageAsPoM,
+}
+
 local function parseSpell(spellID, playerMaxMana)
     local desc = GetSpellDescription(spellID)
-    local avg = getAverageAsHOTSpell(desc)
-    if avg == nil then
-        avg = getAverageAsShieldSpell(desc)
-    end
-    if avg == nil then
-        avg = getAverageAsHealSpell(desc)
-    end
-    if avg == nil then
-        avg = getAverageAsPoM(desc)
+    local avg
+    for _, parseFunc in ipairs(parseFuncs) do
+        avg = parseFunc(desc)
+        if not (avg == nil) then
+            break
+        end
     end
     if avg == nil then
         -- is not a healing/shield spell
