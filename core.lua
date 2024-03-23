@@ -5,5 +5,5 @@ SLASH_HHE3 = "/heirald"
 SlashCmdList.HHE = ShowHHEFrame
 
 for i = 1, NUM_CHAT_WINDOWS do
-    _G["ChatFrame" .. i .. "EditBox"]:SetAltArrowKeyMode(false)
+	_G["ChatFrame" .. i .. "EditBox"]:SetAltArrowKeyMode(false)
 end
