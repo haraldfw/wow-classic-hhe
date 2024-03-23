@@ -39,12 +39,14 @@ local cellInfos = {
 	},
 }
 
+local ROW_WIDTH = 0
+
 local cellInfoMap = nil
-if cellInfoMap == nil then
-	cellInfoMap = {}
-	for _, v in pairs(cellInfos) do
-		cellInfoMap[v.fieldName] = v
-	end
+cellInfoMap = {}
+ROW_WIDTH = 0
+for _, v in pairs(cellInfos) do
+	cellInfoMap[v.fieldName] = v
+	ROW_WIDTH = ROW_WIDTH + v.width
 end
 
 
@@ -63,10 +65,11 @@ end
 
 local function createRow(parent, data, offsetIndex)
 	local row = CreateFrame("Button", nil, parent)
-	row:SetSize(200, CELL_HEIGHT)
+	row:SetSize(ROW_WIDTH, CELL_HEIGHT)
 	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -offsetIndex * CELL_HEIGHT)
 	row.columns = {}
 	local prevCell = nil
+
 	for i, cellInfo in pairs(cellInfos) do
 		local cell;
 		if cellInfo.fieldName == "Icon" then
@@ -89,12 +92,13 @@ local function createRow(parent, data, offsetIndex)
 		prevCell = cell
 		cell:Show()
 	end
+
 	return row
 end
 
 local function updateRenderedData()
 	local child = HHEListScrollFrameScrollChildFrame
-	child:SetHeight(CELL_HEIGHT * 20)
+	child:SetSize(ROW_WIDTH, CELL_HEIGHT * #spellData)
 
 	if child.rows == nil then
 		child.rows = {}
