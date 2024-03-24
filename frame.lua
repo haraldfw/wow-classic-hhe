@@ -1,6 +1,6 @@
 local sortKey = "Name"
 local sortAsc = true
-local spellData = {}
+local spellDatas = {}
 
 local TEXT_CELL_PADDING = 3
 local CELL_HEIGHT = 20
@@ -101,12 +101,21 @@ end
 
 local function updateRenderedData()
 	local child = HHEListScrollFrameScrollChildFrame
-	child:SetSize(HHETABLE_ROW_WIDTH, CELL_HEIGHT * #spellData)
+	child:SetSize(HHETABLE_ROW_WIDTH, CELL_HEIGHT * #spellDatas)
 
 	if child.rows == nil then
 		child.rows = {}
 	end
-	for i, spell in pairs(spellData) do
+	local max = #child.rows
+	if #spellDatas > max then
+		max = #spellDatas
+	end
+	for i = 1, max, 1 do
+		local spell = spellDatas[i]
+		if spell == nil then
+			table.remove(child.rows, i)
+		end
+
 		if child.rows[i] == nil then
 			child.rows[i] = createRow(child, spell, i - 1)
 		else
@@ -120,7 +129,7 @@ end
 
 
 local function sortData()
-	table.sort(spellData, NewSortFuncByField(sortKey, sortAsc))
+	table.sort(spellDatas, NewSortFuncByField(sortKey, sortAsc))
 end
 
 function HandleSortClicked(columnKey)
@@ -152,7 +161,7 @@ function HHEColumnHeader_OnShow(self)
 end
 
 local function updateData()
-	spellData = ParseSpellBook()
+	spellDatas = ParseSpellBook()
 	sortData()
 	updateRenderedData()
 end
