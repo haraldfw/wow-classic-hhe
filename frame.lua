@@ -70,10 +70,10 @@ local function overwriteRow(row, data)
 	end
 end
 
-local function createRow(parent, data, offsetIndex)
-	local row = CreateFrame("Button", nil, parent)
+local function createRow(parent, data, index)
+	local row = CreateFrame("Button", "HHEScrollFrameRow" .. tostring(index), parent)
 	row:SetSize(HHETABLE_ROW_WIDTH, CELL_HEIGHT)
-	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -offsetIndex * CELL_HEIGHT)
+	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -(index - 1) * CELL_HEIGHT)
 	row.columns = {}
 	local prevCell = nil
 
@@ -121,15 +121,15 @@ local function updateRenderedData()
 	for i = 1, max, 1 do
 		local spell = spellDatas[i]
 		if spell == nil then
-			table.remove(child.rows, i)
-		end
-
-		if child.rows[i] == nil then
-			child.rows[i] = createRow(child, spell, i - 1)
+			child.rows[i]:Hide()
 		else
-			overwriteRow(child.rows[i], spell)
+			if child.rows[i] == nil then
+				child.rows[i] = createRow(child, spell, i)
+			else
+				overwriteRow(child.rows[i], spell)
+			end
+			child.rows[i]:Show()
 		end
-		child.rows[i]:Show()
 	end
 
 	child:Show()
@@ -209,19 +209,25 @@ function HHEFrame_OnHide(self)
 	end
 end
 
-function HHEFrame_OnEvent(event, ...)
+function HHEFrame_OnEvent(self, event, ...)
 	print("event" .. tostring(event))
+	Dump(...)
 	if event == "ADDON_LOADED" then
-		if HHESortKey == nil then
-			HHESortKey = "Name"
-		end
-		if HHESortAsc == nil then
-			HHESortAsc = true
-		end
+		local addonName = select(1, ...)
+		if addonName == "HeiraldsHealEfficiencies" then
+			if HHESortKey == nil then
+				HHESortKey = "Name"
+			end
+			if HHESortAsc == nil then
+				HHESortAsc = true
+			end
 
-		local arrowFrame = _G["HHEFrameColumnHeader" .. HHESortKey .. "Arrow"]
-		arrowFrame:SetRotation((not HHESortAsc) and math.pi or 0)
+			local arrowFrame = _G["HHEFrameColumnHeader" .. HHESortKey .. "Arrow"]
+			arrowFrame:SetRotation((not HHESortAsc) and math.pi or 0)
+		end
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		ShowHHEFrame()
+	elseif event == "SPELLS_CHANGED" then
+		updateData()
 	end
 end

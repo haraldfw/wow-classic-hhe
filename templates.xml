@@ -130,9 +130,7 @@
 			<OnHide>
 				HHEFrame_OnHide(self);
 			</OnHide>
-			<OnEvent>
-				HHEFrame_OnEvent(event);
-			</OnEvent>
+			<OnEvent function="HHEFrame_OnEvent" />
 		</Scripts>
 		<Frames>
 			<Button name="HHEFrameColumnHeaderIcon" inherits="HHEColumnHeaderTemplate" text="I">
