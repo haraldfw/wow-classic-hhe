@@ -3,45 +3,58 @@ local spellDatas = {}
 local TEXT_CELL_PADDING = 3
 local CELL_HEIGHT = 20
 
+local clickToSortAppendix = "\n\nClick to sort"
 local cellInfos = {
 	{
 		fieldName = "Icon",
 		width = CELL_HEIGHT,
 		isIcon = true,
 		justifyH = "LEFT",
+		description = "Hover the spell's icon to show info on the spell." .. clickToSortAppendix,
 	},
 	{
 		fieldName = "Name",
 		width = 175,
 		justifyH = "LEFT",
+		description = "Name and rank of the spell." .. clickToSortAppendix,
 	},
 	{
 		fieldName = "Cost",
 		width = 50,
 		justifyH = "RIGHT",
+		description = "The spell's cost in mana." .. clickToSortAppendix,
 	},
 	{
 		fieldName = "Average",
 		width = 70,
 		formatString = "%.1f",
 		justifyH = "RIGHT",
+		description =
+			"The average heal value of the spell. For spells with a roll-range the average is used, for HoTs the total healed is used. For group spells a scalar for the heal value is used." ..
+			clickToSortAppendix,
 	},
 	{
 		fieldName = "Efficiency",
 		width = 70,
 		formatString = "%.2f",
 		justifyH = "RIGHT",
+		description = "How much the spell heals divided by how much mana it cost. Heal per Mana." ..
+			clickToSortAppendix,
 	},
 	{
 		fieldName = "HealPerSecond",
 		width = 70,
 		formatString = "%.2f",
 		justifyH = "RIGHT",
+		description =
+			"How much the spell can heal per second, the longest duration-aspect of the spell is used. So the spell's healpotential divided by whichever is the longest of global cooldown, casting time, channeling time or cooldown." ..
+			clickToSortAppendix,
 	},
 	{
 		fieldName = "IsGroupHeal",
 		width = 50,
 		justifyH = "CENTER",
+		description = "Whether or not the spell heals a group or not." .. clickToSortAppendix,
 	},
 }
 
@@ -183,6 +196,20 @@ function HHEColumnHeader_OnShow(self)
 	if not (self.sortType == HHESortKey) then
 		_G["HHEFrameColumnHeader" .. self.sortType .. "Arrow"]:Hide()
 	end
+end
+
+function HHEColumnHeader_OnEnter(self)
+	local desc = cellInfoMap[self.sortType].description
+	if desc == nil then
+		return
+	end
+	GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
+	GameTooltip:SetText(desc, nil, nil, nil, nil, true)
+	GameTooltip:Show()
+end
+
+function HHEColumnHeader_OnLeave(self)
+	GameTooltip:Hide()
 end
 
 local function updateData()

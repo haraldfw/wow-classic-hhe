@@ -61,6 +61,12 @@
 			<OnShow>
 				HHEColumnHeader_OnShow(self)
 			</OnShow>
+			<OnEnter>
+				HHEColumnHeader_OnEnter(self)
+			</OnEnter>
+			<OnLeave>
+				HHEColumnHeader_OnLeave(self)
+			</OnLeave>
 		</Scripts>
 		<ButtonText name="$parentText">
 			<Anchors>
