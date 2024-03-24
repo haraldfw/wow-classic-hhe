@@ -1,5 +1,3 @@
-local sortKey = "Name"
-local sortAsc = true
 local spellDatas = {}
 
 local TEXT_CELL_PADDING = 3
@@ -25,7 +23,7 @@ local cellInfos = {
 	{
 		fieldName = "Average",
 		width = 70,
-		formatString = "%.2f",
+		formatString = "%.1f",
 		justifyH = "RIGHT",
 	},
 	{
@@ -139,22 +137,22 @@ end
 
 
 local function sortData()
-	table.sort(spellDatas, NewSortFuncByField(sortKey, sortAsc))
+	table.sort(spellDatas, NewSortFuncByField(HHESortKey, HHESortAsc))
 end
 
 function HandleSortClicked(columnKey)
-	local lastSortKey = sortKey
+	local lastSortKey = HHESortKey
 	local hideLastKey = true
-	if sortKey == columnKey then
+	if HHESortKey == columnKey then
 		hideLastKey = false
-		sortAsc = not sortAsc
+		HHESortAsc = not HHESortAsc
 	else
-		sortKey = columnKey
-		sortAsc = true
+		HHESortKey = columnKey
+		HHESortAsc = true
 	end
 
 	local arrowFrame = _G["HHEFrameColumnHeader" .. columnKey .. "Arrow"]
-	arrowFrame:SetRotation((not sortAsc) and math.pi or 0)
+	arrowFrame:SetRotation((not HHESortAsc) and math.pi or 0)
 	arrowFrame:Show()
 	if hideLastKey then
 		_G["HHEFrameColumnHeader" .. lastSortKey .. "Arrow"]:Hide()
@@ -165,7 +163,7 @@ function HandleSortClicked(columnKey)
 end
 
 function HHEColumnHeader_OnShow(self)
-	if not (self.sortType == sortKey) then
+	if not (self.sortType == HHESortKey) then
 		_G["HHEFrameColumnHeader" .. self.sortType .. "Arrow"]:Hide()
 	end
 end
@@ -193,4 +191,37 @@ end
 function ShowHHEFrame()
 	updateData()
 	HHEFrame:Show()
+end
+
+local eventsToRegister = {
+	"SPELLS_CHANGED"
+}
+
+function HHEFrame_OnShow(self)
+	for _, v in pairs(eventsToRegister) do
+		self:RegisterEvent(v);
+	end
+end
+
+function HHEFrame_OnHide(self)
+	for _, v in pairs(eventsToRegister) do
+		self:UnregisterEvent(v);
+	end
+end
+
+function HHEFrame_OnEvent(event, ...)
+	print("event" .. tostring(event))
+	if event == "ADDON_LOADED" then
+		if HHESortKey == nil then
+			HHESortKey = "Name"
+		end
+		if HHESortAsc == nil then
+			HHESortAsc = true
+		end
+
+		local arrowFrame = _G["HHEFrameColumnHeader" .. HHESortKey .. "Arrow"]
+		arrowFrame:SetRotation((not HHESortAsc) and math.pi or 0)
+	elseif event == "PLAYER_ENTERING_WORLD" then
+		ShowHHEFrame()
+	end
 end

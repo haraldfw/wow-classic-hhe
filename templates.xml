@@ -90,7 +90,7 @@
 		</NormalTexture>
 	</Button>
 
-	<Frame name="HHEFrame" setAllPoints="true" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="false" inherits="HHEFrameTemplate">
+	<Frame name="HHEFrame" setAllPoints="true" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true" inherits="HHEFrameTemplate">
 		<Size x="500" y="450"/>
 		<Layers>
 			<Layer level="OVERLAY" textureSubLevel="-1">
@@ -117,11 +117,22 @@
 		</Layers>
 		<Scripts>
 			<OnLoad>
+				HHEFrame:RegisterEvent("ADDON_LOADED");
+				HHEFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
 				HHEFrame:SetScript("OnMouseDown", HHEFrame.StartMoving)
 				HHEFrame:SetScript("OnMouseUp", HHEFrame.StopMovingOrSizing)
 				HHEFrame:SetPoint("CENTER")
 				HHEFrame:SetWidth(HHETABLE_ROW_WIDTH+40)
 			</OnLoad>
+			<OnShow>
+				HHEFrame_OnShow(self);
+			</OnShow>
+			<OnHide>
+				HHEFrame_OnHide(self);
+			</OnHide>
+			<OnEvent>
+				HHEFrame_OnEvent(event);
+			</OnEvent>
 		</Scripts>
 		<Frames>
 			<Button name="HHEFrameColumnHeaderIcon" inherits="HHEColumnHeaderTemplate" text="I">
