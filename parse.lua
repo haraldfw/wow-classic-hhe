@@ -169,7 +169,7 @@ function ParseSpellBook()
 	for i = 1, GetNumSpellTabs() do
 		local offset, numSlots = select(3, GetSpellTabInfo(i))
 		for j = offset + 1, offset + numSlots do
-			local name, rank, spellID = GetSpellBookItemName(j, "BOOKTYPE_SPELL")
+			local name, rank, spellID = GetSpellBookItemName(j, BOOKTYPE_SPELL)
 			local healInfo = parseSpell(spellID, playerMaxMana)
 			if healInfo.IsHealSpell then
 				healInfo.Name = name
