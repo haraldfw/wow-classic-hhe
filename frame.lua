@@ -25,17 +25,19 @@ local cellInfos = {
 	{
 		fieldName = "Average",
 		width = 70,
+		formatString = "%.2f",
 		justifyH = "RIGHT",
 	},
 	{
 		fieldName = "Efficiency",
 		width = 70,
-		formatDecimal = true,
+		formatString = "%.2f",
 		justifyH = "RIGHT",
 	},
 	{
 		fieldName = "HealPerSecond",
 		width = 70,
+		formatString = "%.2f",
 		justifyH = "RIGHT",
 	},
 	{
@@ -61,7 +63,11 @@ local function overwriteRow(row, data)
 		if cellInfo.fieldName == "Icon" then
 			cell:SetTexture(data[cellInfo.fieldName])
 		else
-			cell:SetText(data[cellInfo.fieldName])
+			local fieldText = data[cellInfo.fieldName]
+			if cellInfo.formatString ~= nil then
+				fieldText = string.format(cellInfo.formatString, fieldText)
+			end
+			cell:SetText(fieldText)
 		end
 	end
 end
@@ -83,7 +89,11 @@ local function createRow(parent, data, offsetIndex)
 			cell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 			cell:ClearAllPoints()
 			cell:SetSize(cellInfo.width - TEXT_CELL_PADDING, CELL_HEIGHT)
-			cell:SetText(data[cellInfo.fieldName])
+			local fieldText = data[cellInfo.fieldName]
+			if cellInfo.formatString ~= nil then
+				fieldText = string.format(cellInfo.formatString, fieldText)
+			end
+			cell:SetText(fieldText)
 			cell:SetJustifyH(cellInfo.justifyH)
 		end
 		if not (prevCell == nil) then

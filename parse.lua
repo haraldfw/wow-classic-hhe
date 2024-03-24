@@ -57,10 +57,6 @@ local function getAverageAsPenance(desc)
 	}
 end
 
-local function toTruncNumber(val)
-	return tonumber(string.format("%.2f", val))
-end
-
 local function calcHPS(averageHeal, durations)
 	local highestDuration = 0;
 	for i = 1, #durations, 1 do
@@ -152,17 +148,17 @@ local function parseSpell(spellID, playerMaxMana)
 	return {
 		IsHealSpell = true,
 		SpellID = spellID,
-		Average = valueHealed and toTruncNumber(valueHealed) or 0,
-		HotSeconds = avg.HOTSeconds and toTruncNumber(avg.HOTSeconds) or 0,
-		ChanneledForSeconds = avg.ChanneledForSeconds and toTruncNumber(avg.ChanneledForSeconds) or 0,
+		Average = valueHealed or 0,
+		HotSeconds = avg.HOTSeconds or 0,
+		ChanneledForSeconds = avg.ChanneledForSeconds or 0,
 		IsGroupHeal = IsGroupHeal and "Yes" or "No",
-		CastingTime = castTime and toTruncNumber(castTime) or 0,
-		Cost = cost and toTruncNumber(cost) or 0,
+		CastingTime = castTime or 0,
+		Cost = cost or 0,
 		Icon = icon,
-		Efficiency = efficiency and toTruncNumber(efficiency) or 0,
+		Efficiency = efficiency or 0,
 		Cooldown = cooldown,
 		GlobalCooldown = globalCooldown,
-		HealPerSecond = toTruncNumber(healPerSecond),
+		HealPerSecond = healPerSecond or 0,
 	}
 end
 
