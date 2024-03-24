@@ -1,5 +1,5 @@
 # TODO
-* Tooltips for the following: explanation on each column header, spell description on spell icons
+* Tooltips for the following: explanation on each column header
 * Change how spells are fetched (don't use spellbook)
 * Store variables like sortType, sortAsc, groupscale between reloads
 * Hook on to event to parse spells when a new spell is learnt/unlearnt

@@ -52,6 +52,19 @@ for _, v in pairs(cellInfos) do
 	HHETABLE_ROW_WIDTH = HHETABLE_ROW_WIDTH + v.width
 end
 
+local function newOnEnter(spellID)
+	return function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		GameTooltip:SetSpellByID(spellID)
+		GameTooltip:Show()
+	end
+end
+
+local function newOnLeave(spellID)
+	return function()
+		GameTooltip:Hide()
+	end
+end
 
 local function overwriteRow(row, data)
 	local i = 0
@@ -60,6 +73,8 @@ local function overwriteRow(row, data)
 		local cell = row.columns[i]
 		if cellInfo.fieldName == "Icon" then
 			cell:SetTexture(data[cellInfo.fieldName])
+			cell:SetScript("OnEnter", newOnEnter(data.SpellID))
+			cell:SetScript("OnLeave", newOnLeave(data.SpellID))
 		else
 			local fieldText = data[cellInfo.fieldName]
 			if cellInfo.formatString ~= nil then
@@ -83,6 +98,8 @@ local function createRow(parent, data, index)
 			cell = row:CreateTexture(nil, "OVERLAY")
 			cell:SetSize(cellInfo.width, CELL_HEIGHT)
 			cell:SetTexture(data[cellInfo.fieldName])
+			cell:SetScript("OnEnter", newOnEnter(data.SpellID))
+			cell:SetScript("OnLeave", newOnLeave(data.SpellID))
 		else
 			cell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 			cell:ClearAllPoints()
