@@ -138,6 +138,23 @@
 			<OnEvent function="HHEFrame_OnEvent" />
 		</Scripts>
 		<Frames>
+			<Button name="$parentShowIgnoredButton" inherits="UIPanelButtonTemplate" text="Show ignored spells">
+				<Size x="120" y="21"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-7" y="-24"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( HHEIgnoredSpellsInfoFrame:IsShown() ) then
+							HHEIgnoredSpellsInfoFrame:Hide()
+						else
+							ShowHHEIgnoredSpellsFrame()
+						end
+					</OnClick>
+				</Scripts>
+				<NormalFont style="GameFontNormalSmall"/>
+				<HighlightFont style="GameFontHighlightSmall"/>
+			</Button>
 			<Button name="HHEFrameColumnHeaderIcon" inherits="HHEColumnHeaderTemplate" text="I">
 				<Anchors>
 					<Anchor point="TOPLEFT" x="7" y="-57"/>
@@ -232,16 +249,6 @@
 					<Anchor point="TOPLEFT" x="5" y="-80"/>
 					<Anchor point="BOTTOMRIGHT" x="-5" y="46"/>
 				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<FontString name="HHEFrameTotals" inherits="GameFontNormalSmall">
-							<Size x="298" y="16"/>
-							<Anchors>
-								<Anchor point="BOTTOM" x="0" y="5"/>
-							</Anchors>
-						</FontString>
-					</Layer>
-				</Layers>
 			</Frame>
 			<ScrollFrame name="HHEListScrollFrame" inherits="UIPanelScrollFrameTemplate">
 				<Size x="20" y="287"/>
@@ -272,6 +279,106 @@
 					<Frame name="$parentScrollChildFrame" parentKey="ScrollChildFrame" />
 				</ScrollChild>
 			</ScrollFrame>
+			<Frame name="HHEIgnoredSpellsInfoFrame" inherits="BackdropTemplate" enableMouse="true" hidden="true">
+				<KeyValues>
+					<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+				</KeyValues>
+				<Size x="270" y="250"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="HHEFrame" relativePoint="TOPRIGHT" x="1" y="-16"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="HHEIgnoredSpellsInfoDetailHeader" file="Interface\RaidFrame\UI-RaidInfo-Header">
+							<Size>
+								<AbsDimension x="250" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="11" y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture name="HHEIgnoredSpellsInfoDetailCorner" file="Interface\DialogFrame\UI-DialogBox-Corner">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-6" y="-7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<FontString name="HHEIgnoredSpellsInfoHeader" inherits="GameFontNormal" text="Ignored spells">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="-15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="HHEIgnoredSpellsInfoSubheader" inherits="GameFontHighlightSmall" text="Spells that did not match any parsers">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="HHEIgnoredSpellsInfoHeader" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="HHEIgnoredSpellsInfoCloseButton" inherits="UIPanelCloseButton">
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-3" y="-3"/>
+						</Anchors>
+					</Button>
+					<ScrollFrame name="HHEIgnoredSpellsInfoScrollFrame" inherits="UIPanelScrollFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" x="12" y="-51" />
+							<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT" x="-36" y="-51"/>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT" x="-36" y="12"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size x="31" y="150"/>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-2" y="3"/>
+									</Anchors>
+									<TexCoords left="0" right="0.484375" top="0" bottom="0.6"/>
+								</Texture>
+								<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size x="31" y="106"/>
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-2" y="-2"/>
+									</Anchors>
+									<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<ScrollChild>
+							<Frame name="$parentScrollChildFrame" parentKey="ScrollChildFrame" />
+						</ScrollChild>
+					</ScrollFrame>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+					</OnShow>
+					<OnHide>
+						PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+					</OnHide>
+				</Scripts>
+			</Frame>
 		</Frames>
 	</Frame>
 </Ui>

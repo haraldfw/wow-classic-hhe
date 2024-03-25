@@ -1,4 +1,5 @@
 local spellDatas = {}
+local ignoredSpellDatas = {}
 
 local TEXT_CELL_PADDING = 3
 local CELL_HEIGHT = 20
@@ -64,6 +65,7 @@ for _, v in pairs(cellInfos) do
 	cellInfoMap[v.fieldName] = v
 	HHETABLE_ROW_WIDTH = HHETABLE_ROW_WIDTH + v.width
 end
+HHE_IGNORED_TABLE_ROW_WIDTH = cellInfoMap.Icon.width + cellInfoMap.Name.width
 
 local function newOnEnter(spellID)
 	return function(self)
@@ -124,7 +126,7 @@ local function createRow(parent, data, index)
 			cell:SetText(fieldText)
 			cell:SetJustifyH(cellInfo.justifyH)
 		end
-		if not (prevCell == nil) then
+		if prevCell ~= nil then
 			cell:SetPoint("TOPLEFT", prevCell, "TOPRIGHT", TEXT_CELL_PADDING, 0)
 		else
 			cell:SetPoint("TOPLEFT", row, "TOPLEFT")
@@ -135,6 +137,45 @@ local function createRow(parent, data, index)
 	end
 
 	return row
+end
+
+local function createIgnoredSpellRow(parent, data, index)
+	local row = CreateFrame("Button", "HHEIgnoredSpellsScrollFrameRow" .. tostring(index), parent)
+	row:SetSize(HHE_IGNORED_TABLE_ROW_WIDTH, CELL_HEIGHT)
+	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -(index - 1) * CELL_HEIGHT)
+	row.columns = {}
+
+	local ci = cellInfoMap.Icon
+	local iconCell = row:CreateTexture(nil, "OVERLAY")
+	iconCell:SetSize(ci.width, CELL_HEIGHT)
+	iconCell:SetTexture(data.Icon)
+	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
+	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
+	iconCell:SetPoint("TOPLEFT", row, "TOPLEFT")
+	row.columns[1] = iconCell
+	iconCell:Show()
+
+	ci = cellInfoMap.Name
+	local nameCell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	nameCell:ClearAllPoints()
+	nameCell:SetSize(ci.width - TEXT_CELL_PADDING, CELL_HEIGHT)
+	nameCell:SetText(data.Name)
+	nameCell:SetJustifyH(ci.justifyH)
+	nameCell:SetPoint("TOPLEFT", iconCell, "TOPRIGHT", TEXT_CELL_PADDING, 0)
+	row.columns[2] = nameCell
+	nameCell:Show()
+
+	return row
+end
+
+local function overwriteIgnoredSpellRow(row, data)
+	local iconCell = row.columns[1]
+	iconCell:SetTexture(data.Icon)
+	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
+	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
+
+	local nameCell = row.columns[2]
+	nameCell:SetText(data.Name)
 end
 
 local function updateRenderedData()
@@ -193,7 +234,7 @@ function HandleSortClicked(columnKey)
 end
 
 function HHEColumnHeader_OnShow(self)
-	if not (self.sortType == HHESortKey) then
+	if self.sortType ~= HHESortKey then
 		_G["HHEFrameColumnHeader" .. self.sortType .. "Arrow"]:Hide()
 	end
 end
@@ -212,10 +253,44 @@ function HHEColumnHeader_OnLeave(self)
 	GameTooltip:Hide()
 end
 
+local function updateRenderedIgnoredSpells()
+	table.sort(ignoredSpellDatas, NewSortFuncByField("Name", true))
+
+	local child = HHEIgnoredSpellsInfoScrollFrameScrollChildFrame
+	child:SetSize(HHETABLE_ROW_WIDTH, CELL_HEIGHT * #ignoredSpellDatas)
+	HHEIgnoredSpellsInfoHeader:SetText("Ignored spells (" .. tostring(#ignoredSpellDatas) .. ")")
+
+	if child.rows == nil then
+		child.rows = {}
+	end
+	local max = #child.rows
+	if #ignoredSpellDatas > max then
+		max = #ignoredSpellDatas
+	end
+	for i = 1, max, 1 do
+		local spell = ignoredSpellDatas[i]
+		if spell == nil then
+			child.rows[i]:Hide()
+		else
+			if child.rows[i] == nil then
+				child.rows[i] = createIgnoredSpellRow(child, spell, i)
+			else
+				overwriteIgnoredSpellRow(child.rows[i], spell)
+			end
+			child.rows[i]:Show()
+		end
+	end
+
+	child:Show()
+end
+
 local function updateData()
-	spellDatas = ParseSpellBook()
+	spellDatas, ignoredSpellDatas = ParseSpellBook()
 	sortData()
 	updateRenderedData()
+	if HHEIgnoredSpellsInfoFrame:IsShown() then
+		updateRenderedIgnoredSpells()
+	end
 end
 
 function HHEFrameColumn_SetWidth(self)
@@ -235,6 +310,11 @@ end
 function ShowHHEFrame()
 	updateData()
 	HHEFrame:Show()
+end
+
+function ShowHHEIgnoredSpellsFrame()
+	updateRenderedIgnoredSpells()
+	HHEIgnoredSpellsInfoFrame:Show()
 end
 
 local eventsToRegister = {
@@ -268,7 +348,9 @@ function HHEFrame_OnEvent(self, event, ...)
 			arrowFrame:SetRotation((not HHESortAsc) and math.pi or 0)
 		end
 	elseif event == "PLAYER_ENTERING_WORLD" then
-		ShowHHEFrame()
+		if OPEN_ON_LOAD then
+			ShowHHEFrame()
+		end
 	elseif event == "SPELLS_CHANGED" then
 		updateData()
 	end

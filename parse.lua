@@ -109,7 +109,7 @@ local function calcHPS(averageHeal, durations)
 	local highestDuration = 0;
 	for i = 1, #durations, 1 do
 		local value = durations[i]
-		if not (value == nil) and value > highestDuration then
+		if value ~= nil and value > highestDuration then
 			highestDuration = value
 		end
 	end
@@ -137,7 +137,7 @@ local function parseSpell(spellID, playerMaxMana)
 	local avg
 	for i = 1, #parseFuncs, 1 do
 		avg = parseFuncs[i](desc)
-		if not (avg == nil) then
+		if avg ~= nil then
 			break
 		end
 	end
@@ -163,6 +163,7 @@ local function parseSpell(spellID, playerMaxMana)
 			cost = costObj.cost
 		end
 
+		-- "costObj.cost" is the max cost of the spell
 		if cost > costObj.cost then
 			cost = costObj.cost
 		end
@@ -187,7 +188,7 @@ local function parseSpell(spellID, playerMaxMana)
 	local globalCooldown = globalCooldownMS / 1000
 
 	local healPerSecond;
-	if not (valueHealed == nil) and valueHealed > 0 then
+	if valueHealed ~= nil and valueHealed > 0 then
 		healPerSecond = calcHPS(
 			valueHealed, {
 				avg.HOTSeconds,
@@ -200,7 +201,6 @@ local function parseSpell(spellID, playerMaxMana)
 
 	return {
 		IsHealSpell = true,
-		SpellID = spellID,
 		Average = valueHealed or 0,
 		HotSeconds = avg.HOTSeconds or 0,
 		ChanneledForSeconds = avg.ChanneledForSeconds or 0,
@@ -216,24 +216,30 @@ local function parseSpell(spellID, playerMaxMana)
 end
 
 function ParseSpellBook()
+	local playerClass = UnitClassBase("player")
 	local playerMaxMana = UnitPowerMax("player", Enum.PowerType.Mana)
 	local spells = {}
-	local spellIndex = 1
+	local ignoredSpells = {}
 	for i = 1, GetNumSpellTabs() do
 		local offset, numSlots = select(3, GetSpellTabInfo(i))
 		for j = offset + 1, offset + numSlots do
 			local name, rank, spellID = GetSpellBookItemName(j, BOOKTYPE_SPELL)
-			local healInfo = parseSpell(spellID, playerMaxMana)
-			if healInfo.IsHealSpell then
-				healInfo.Name = name
-				if not (rank == nil) then
-					healInfo.Name = healInfo.Name .. " " .. rank
-				end
-				spells[spellIndex] = healInfo
-				spellIndex = spellIndex + 1
+			local spellInfo = parseSpell(spellID, playerMaxMana)
+			spellInfo.SpellID = spellID
+			spellInfo.Name = name
+			spellInfo.NameWithoutRank = name
+			if rank ~= nil then
+				spellInfo.Name = spellInfo.Name .. " " .. rank
+			end
+			if spellInfo.IsHealSpell then
+				table.insert(spells, spellInfo)
+			else
+				local _, _, icon, _, _, _, _ = GetSpellInfo(spellID)
+				spellInfo.Icon = icon
+				table.insert(ignoredSpells, spellInfo)
 			end
 		end
 	end
 
-	return spells
+	return spells, ignoredSpells
 end
