@@ -254,8 +254,6 @@ function HHEFrame_OnHide(self)
 end
 
 function HHEFrame_OnEvent(self, event, ...)
-	print("event" .. tostring(event))
-	Dump(...)
 	if event == "ADDON_LOADED" then
 		local addonName = select(1, ...)
 		if addonName == "HeiraldsHealEfficiencies" then

@@ -1,4 +1,52 @@
-local function getAverageAsHOTSpell(desc)
+local function getAverageAsRegrowthSpell(desc)
+	local _, _, from, to, hot, hotSeconds = string.find(desc,
+		"Heals a friendly target for (%d+) to (%d+) and another (%d+) over (%d+) sec.")
+	if from == nil then
+		return nil
+	end
+
+	return {
+		Average = tonumber((from + to) / 2 + tonumber(hot)),
+		HOTSeconds = tonumber(hotSeconds),
+	}
+end
+
+local function getAverageAsLifebloom(desc)
+	local _, _, value, hotSeconds, extraHeal = string.find(desc,
+		"Heals the target for (%d+) over (%d+) sec. When Lifebloom completes its duration or is dispelled, the target instantly heals for (%d+)")
+	if value == nil then
+		return nil
+	end
+	return {
+		Average = tonumber(value + extraHeal),
+		HOTSeconds = tonumber(hotSeconds),
+	}
+end
+
+local function getAverageAsRejuv(desc)
+	local _, _, value, hotSeconds = string.find(desc, "Heals the target for (%d+) over (%d+) sec.")
+	if value == nil then
+		return nil
+	end
+	return {
+		Average = tonumber(value),
+		HOTSeconds = tonumber(hotSeconds),
+	}
+end
+
+local function getAverageAsTranquility(desc)
+	local _, _, value, secInterval, forSeconds = string.find(desc,
+		"Regenerates all nearby group members for (%d+) every (%d+) seconds for (%d+) sec.")
+	if value == nil then
+		return nil
+	end
+	return {
+		Average = tonumber(value) * (tonumber(forSeconds) / tonumber(secInterval)),
+		ChanneledForSeconds = tonumber(forSeconds),
+	}
+end
+
+local function getAverageAsRenew(desc)
 	local _, _, value, seconds = string.find(desc, "of (%d+) damage over (%d+) sec")
 	if value == nil or not (string.match(desc, "Heal") or string.match(desc, "heal")) then
 		return nil
@@ -73,7 +121,11 @@ local function calcHPS(averageHeal, durations)
 end
 
 local parseFuncs = {
-	getAverageAsHOTSpell,
+	getAverageAsRegrowthSpell,
+	getAverageAsRejuv,
+	getAverageAsLifebloom,
+	getAverageAsTranquility,
+	getAverageAsRenew,
 	getAverageAsShieldSpell,
 	getAverageAsHealSpell,
 	getAverageAsPoM,
@@ -118,7 +170,8 @@ local function parseSpell(spellID, playerMaxMana)
 
 	local valueHealed = tonumber(avg.Average)
 
-	local IsGroupHeal = string.match(desc, "party members") or string.match(desc, "party or raid member")
+	local IsGroupHeal = string.match(desc, "party members") or string.match(desc, "party or raid member") or
+		string.match(desc, "group members")
 	if IsGroupHeal then
 		-- lets be optimistic
 		valueHealed = valueHealed * 5

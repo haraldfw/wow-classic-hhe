@@ -55,8 +55,7 @@
 				if ( self.sortType ) then
 					HandleSortClicked(self.sortType)
 				end
-
-				PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+				PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 			</OnClick>
 			<OnShow>
 				HHEColumnHeader_OnShow(self)
