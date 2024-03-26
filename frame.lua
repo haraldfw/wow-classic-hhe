@@ -82,7 +82,7 @@ local function newOnLeave(spellID)
 end
 
 
-local function newDescriptionBoxWriter(desc, toChain)
+local function newDescriptionBoxWriter(spellName, desc, toChain)
 	return function(...)
 		if HHEDevEditBox == nil then
 			HHEDevEditBox = CreateFrame("EditBox", "HHEDevEditBox", HHEFrame)
@@ -98,7 +98,7 @@ local function newDescriptionBoxWriter(desc, toChain)
 		elseif not HHEDevEditBox:IsShown() then
 			HHEDevEditBox:Show()
 		end
-		HHEDevEditBox:SetText(desc)
+		HHEDevEditBox:SetText(spellName .. ": " .. desc)
 		if toChain ~= nil then
 			toChain(...)
 		end
@@ -115,7 +115,8 @@ local function overwriteRow(row, data)
 			cell:SetScript("OnEnter", newOnEnter(data.SpellID))
 			cell:SetScript("OnLeave", newOnLeave(data.SpellID))
 			if DEV_MODE then
-				cell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+				cell:SetScript("OnEnter",
+					newDescriptionBoxWriter(data.NameWithoutRank, data.Description, newOnEnter(data.SpellID)))
 			end
 		else
 			local fieldText = data[cellInfo.fieldName]
@@ -143,7 +144,8 @@ local function createRow(parent, data, index)
 			cell:SetScript("OnEnter", newOnEnter(data.SpellID))
 			cell:SetScript("OnLeave", newOnLeave(data.SpellID))
 			if DEV_MODE then
-				cell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+				cell:SetScript("OnEnter",
+					newDescriptionBoxWriter(data.NameWithoutRank, data.Description, newOnEnter(data.SpellID)))
 			end
 		else
 			cell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -183,7 +185,8 @@ local function createIgnoredSpellRow(parent, data, index)
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
 	iconCell:SetPoint("TOPLEFT", row, "TOPLEFT")
 	if DEV_MODE then
-		iconCell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+		iconCell:SetScript("OnEnter",
+			newDescriptionBoxWriter(data.NameWithoutRank, data.Description, newOnEnter(data.SpellID)))
 	end
 	row.columns[1] = iconCell
 	iconCell:Show()
@@ -207,7 +210,8 @@ local function overwriteIgnoredSpellRow(row, data)
 	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
 	if DEV_MODE then
-		iconCell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+		iconCell:SetScript("OnEnter",
+			newDescriptionBoxWriter(data.NameWithoutRank, data.Description, newOnEnter(data.SpellID)))
 	end
 
 	local nameCell = row.columns[2]

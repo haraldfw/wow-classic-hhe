@@ -5,6 +5,7 @@
 ## Author: Heirald
 ## SavedVariablesPerCharacter: HHESortKey, HHESortAsc
 
+priest.lua
 parse.lua
 sort.lua
 frame.lua
