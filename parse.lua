@@ -72,7 +72,7 @@ local function parseSpell(spellID, playerMaxMana)
 
 	if avg.OptimisticNumberOfTargets > 1 then
 		-- TODO: let user configure which scale to use
-		avg.Average = avg.Average * 5
+		avg.Average = avg.Average * avg.OptimisticNumberOfTargets
 	end
 
 	local efficiency = 0
@@ -80,18 +80,16 @@ local function parseSpell(spellID, playerMaxMana)
 		efficiency = avg.Average / cost
 	end
 
-	local cooldownMS, globalCooldownMS = GetSpellBaseCooldown(spellID)
-	local cooldown = cooldownMS / 1000
+	local _, globalCooldownMS = GetSpellBaseCooldown(spellID)
 	local globalCooldown = globalCooldownMS / 1000
 
 	local healPerSecond;
-	if avg.Average ~= nil and avg.Average > 0 then
+	if avg.Average > 0 then
 		healPerSecond = calcHPS(
 			avg.Average, {
 				avg.HOTSeconds,
 				avg.ChanneledForSeconds,
 				castTime,
-				cooldown,
 				globalCooldown,
 			})
 	end
@@ -107,7 +105,6 @@ local function parseSpell(spellID, playerMaxMana)
 		Cost = cost or 0,
 		Icon = icon,
 		Efficiency = efficiency or 0,
-		Cooldown = cooldown,
 		GlobalCooldown = globalCooldown,
 		HealPerSecond = healPerSecond or 0,
 	}

@@ -48,7 +48,7 @@ local cellInfos = {
 		formatString = "%.2f",
 		justifyH = "RIGHT",
 		description =
-			"How much the spell can heal per second, the longest duration-aspect of the spell is used. So the spell's healpotential divided by whichever is the longest of global cooldown, casting time, channeling time or cooldown." ..
+			"How much the spell can heal per second, the longest duration-aspect of the spell is used. So the spell's healpotential divided by whichever is the longest of global cooldown, casting time, or channeling time." ..
 			clickToSortAppendix,
 	},
 	{

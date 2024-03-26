@@ -132,17 +132,17 @@ end
 
 -- Prayer of Healing: A powerful prayer heals party members within 30 yards for 312 to 333.
 local function parsePrayerOfHealing(desc)
-	local _, _, value, seconds = string.find(desc,
+	local _, _, fromValue, toValue = string.find(desc,
 		"A powerful prayer heals party members within 30 yards for (%d+) to (%d+).")
-	if value == nil then
+	if fromValue == nil then
 		return nil
 	end
 	return {
-		Average = tonumber(value),
-		HOTSeconds = tonumber(seconds),
+		Average = (tonumber(fromValue) + tonumber(toValue)) / 2,
+		HOTSeconds = 0,
 		ChanneledForSeconds = 0,
 		ConservativeNumberOfTargets = 1,
-		BalancedNumberOfTargets = 1,
+		BalancedNumberOfTargets = 2,
 		OptimisticNumberOfTargets = 5,
 	}
 end
