@@ -6,6 +6,7 @@
 ## SavedVariablesPerCharacter: HHESortKey, HHESortAsc
 
 priest.lua
+druid.lua
 parse.lua
 sort.lua
 frame.lua

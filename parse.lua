@@ -15,6 +15,7 @@ end
 
 local parsers = {
 	["PRIEST"] = PriestParsers,
+	["DRUID"] = DruidParsers,
 }
 
 local function parseSpell(spellID, playerMaxMana)
