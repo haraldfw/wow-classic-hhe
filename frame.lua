@@ -81,6 +81,30 @@ local function newOnLeave(spellID)
 	end
 end
 
+
+local function newDescriptionBoxWriter(desc, toChain)
+	return function(...)
+		if HHEDevEditBox == nil then
+			HHEDevEditBox = CreateFrame("EditBox", "HHEDevEditBox", HHEFrame)
+			HHEDevEditBox:SetFontObject(GameFontNormal)
+			HHEDevEditBox:SetSize(190, 24)
+			HHEDevEditBox:SetJustifyH("CENTER")
+			HHEDevEditBox:SetPoint("BOTTOMRIGHT", HHEFrame, "TOPRIGHT")
+			HHEDevEditBox:SetMultiLine(false)
+			HHEDevEditBox:SetScript("OnEscapePressed", function(self)
+				self:ClearFocus()
+				self:Hide()
+			end)
+		elseif not HHEDevEditBox:IsShown() then
+			HHEDevEditBox:Show()
+		end
+		HHEDevEditBox:SetText(desc)
+		if toChain ~= nil then
+			toChain(...)
+		end
+	end
+end
+
 local function overwriteRow(row, data)
 	local i = 0
 	for _, cellInfo in pairs(cellInfos) do
@@ -90,6 +114,9 @@ local function overwriteRow(row, data)
 			cell:SetTexture(data[cellInfo.fieldName])
 			cell:SetScript("OnEnter", newOnEnter(data.SpellID))
 			cell:SetScript("OnLeave", newOnLeave(data.SpellID))
+			if DEV_MODE then
+				cell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+			end
 		else
 			local fieldText = data[cellInfo.fieldName]
 			if cellInfo.formatString ~= nil then
@@ -115,6 +142,9 @@ local function createRow(parent, data, index)
 			cell:SetTexture(data[cellInfo.fieldName])
 			cell:SetScript("OnEnter", newOnEnter(data.SpellID))
 			cell:SetScript("OnLeave", newOnLeave(data.SpellID))
+			if DEV_MODE then
+				cell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+			end
 		else
 			cell = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 			cell:ClearAllPoints()
@@ -152,6 +182,9 @@ local function createIgnoredSpellRow(parent, data, index)
 	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
 	iconCell:SetPoint("TOPLEFT", row, "TOPLEFT")
+	if DEV_MODE then
+		iconCell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+	end
 	row.columns[1] = iconCell
 	iconCell:Show()
 
@@ -173,6 +206,9 @@ local function overwriteIgnoredSpellRow(row, data)
 	iconCell:SetTexture(data.Icon)
 	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
+	if DEV_MODE then
+		iconCell:SetScript("OnEnter", newDescriptionBoxWriter(data.Description, newOnEnter(data.SpellID)))
+	end
 
 	local nameCell = row.columns[2]
 	nameCell:SetText(data.Name)
@@ -348,7 +384,7 @@ function HHEFrame_OnEvent(self, event, ...)
 			arrowFrame:SetRotation((not HHESortAsc) and math.pi or 0)
 		end
 	elseif event == "PLAYER_ENTERING_WORLD" then
-		if OPEN_ON_LOAD then
+		if DEV_MODE then
 			ShowHHEFrame()
 		end
 	elseif event == "SPELLS_CHANGED" then

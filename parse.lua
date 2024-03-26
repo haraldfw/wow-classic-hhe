@@ -145,6 +145,7 @@ local function parseSpell(spellID, playerMaxMana)
 		-- current spellID is not a healing/shield spell
 		return {
 			IsHealSpell = false,
+			Description = desc,
 		}
 	end
 
@@ -201,6 +202,7 @@ local function parseSpell(spellID, playerMaxMana)
 
 	return {
 		IsHealSpell = true,
+		Description = desc,
 		Average = valueHealed or 0,
 		HotSeconds = avg.HOTSeconds or 0,
 		ChanneledForSeconds = avg.ChanneledForSeconds or 0,

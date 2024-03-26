@@ -1,4 +1,5 @@
-OPEN_ON_LOAD = true
+DEV_MODE = false
+
 SLASH_HHE1 = "/hhe"
 SLASH_HHE2 = "/heiraldshealefficiencies"
 SLASH_HHE3 = "/heirald"
