@@ -107,7 +107,7 @@ end
 
 local function overwriteRow(row, data)
 	local i = 0
-	if DEV_MODE then
+	if HHEDebug then
 		row:SetScript("OnClick",
 			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
 	end
@@ -134,7 +134,7 @@ local function createRow(parent, data, index)
 	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -(index - 1) * CELL_HEIGHT)
 	row.columns = {}
 	local prevCell = nil
-	if DEV_MODE then
+	if HHEDebug then
 		row:SetScript("OnClick",
 			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
 	end
@@ -184,7 +184,7 @@ local function createIgnoredSpellRow(parent, data, index)
 	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
 	iconCell:SetPoint("TOPLEFT", row, "TOPLEFT")
-	if DEV_MODE then
+	if HHEDebug then
 		row:SetScript("OnClick",
 			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
 	end
@@ -209,7 +209,7 @@ local function overwriteIgnoredSpellRow(row, data)
 	iconCell:SetTexture(data.Icon)
 	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
-	if DEV_MODE then
+	if HHEDebug then
 		row:SetScript("OnClick",
 			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
 	end
@@ -347,6 +347,36 @@ function HHEFrameColumn_SetWidth(self)
 	self:SetWidth(ci.width + 2);
 end
 
+function HHEHandleCommand(arg)
+	print(arg)
+	if arg == nil then
+		arg = ""
+	else
+		arg = arg:lower(arg)
+	end
+
+	if arg == "" or arg == "toggle" then
+		if HHEFrame:IsShown() then
+			HHEFrame:Hide()
+		else
+			ShowHHEFrame()
+		end
+	elseif arg == "show" then
+		ShowHHEFrame()
+	elseif arg == "hide" then
+		HHEFrame:Hide()
+	elseif arg == "debug on" then
+		HHEDebug = true
+		print("HHE debug enabled, you should do a /reload for it to fully take effect. Disable debug by /hhe debug off")
+	elseif arg == "debug off" then
+		HHEDebug = false
+		print(
+			"HHE debug disabled, you should do a /reload for it to fully take effect. Enable it again by running /hhe debug on")
+	else
+		print("unrecognized command")
+	end
+end
+
 function ShowHHEFrame()
 	updateData()
 	HHEFrame:Show()
@@ -388,7 +418,7 @@ function HHEFrame_OnEvent(self, event, ...)
 			arrowFrame:SetRotation((not HHESortAsc) and math.pi or 0)
 		end
 	elseif event == "PLAYER_ENTERING_WORLD" then
-		if DEV_MODE then
+		if HHEDebug then
 			ShowHHEFrame()
 		end
 	elseif event == "SPELLS_CHANGED" then

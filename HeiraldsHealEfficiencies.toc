@@ -3,7 +3,7 @@
 ## Title: 1 Heiralds Heal Efficiencies
 ## Notes: Shows you how efficient different healing spells are
 ## Author: Heirald
-## SavedVariablesPerCharacter: HHESortKey, HHESortAsc
+## SavedVariablesPerCharacter: HHESortKey, HHESortAsc, HHEDebug
 
 priest.lua
 druid.lua
