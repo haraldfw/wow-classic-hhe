@@ -1,6 +1,6 @@
 ## Interface: 53623
 ## Version: 1.0.0
-## Title: 1 Heiralds Heal Efficiencies
+## Title: Heiralds Heal Efficiencies
 ## Notes: Shows you how efficient different healing spells are
 ## Author: Heirald
 ## SavedVariablesPerCharacter: HHESortKey, HHESortAsc, HHEDebug

@@ -366,12 +366,21 @@ function HHEHandleCommand(arg)
 	elseif arg == "hide" then
 		HHEFrame:Hide()
 	elseif arg == "debug on" then
-		HHEDebug = true
-		print("HHE debug enabled, you should do a /reload for it to fully take effect. Disable debug by /hhe debug off")
+		if HHEDebug then
+			print("debug already enabled")
+		else
+			HHEDebug = true
+			print(
+				"HHE debug enabled, you should do a /reload for it to fully take effect. Disable debug by /hhe debug off")
+		end
 	elseif arg == "debug off" then
-		HHEDebug = false
-		print(
-			"HHE debug disabled, you should do a /reload for it to fully take effect. Enable it again by running /hhe debug on")
+		if not HHEDebug then
+			print("debug already disabled")
+		else
+			HHEDebug = false
+			print(
+				"HHE debug disabled, you should do a /reload for it to fully take effect. Enable it again by /hhe debug on")
+		end
 	else
 		print("unrecognized command")
 	end

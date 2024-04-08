@@ -1,4 +1,5 @@
 # TODO
+* Button to report ignored spell
 * Paladin support
 * Resto druid support
 * Change how spells are fetched (don't use spellbook)
