@@ -248,7 +248,7 @@
 			<Frame name="HHEFrameListInset" inherits="InsetFrameTemplate" frameStrata="MEDIUM">
 				<Anchors>
 					<Anchor point="TOPLEFT" x="5" y="-80"/>
-					<Anchor point="BOTTOMRIGHT" x="-5" y="46"/>
+					<Anchor point="BOTTOMRIGHT" x="-5" y="23"/>
 				</Anchors>
 			</Frame>
 			<ScrollFrame name="HHEListScrollFrame" inherits="UIPanelScrollFrameTemplate">

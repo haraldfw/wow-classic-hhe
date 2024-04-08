@@ -348,7 +348,6 @@ function HHEFrameColumn_SetWidth(self)
 end
 
 function HHEHandleCommand(arg)
-	print(arg)
 	if arg == nil then
 		arg = ""
 	else
