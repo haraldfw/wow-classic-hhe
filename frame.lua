@@ -67,6 +67,39 @@ for _, v in pairs(cellInfos) do
 end
 HHE_IGNORED_TABLE_ROW_WIDTH = cellInfoMap.Icon.width + cellInfoMap.Name.width
 
+StaticPopupDialogs["HHE_IGNORED_SPELL_CREATE_ISSUE"] = {
+	text = "PLACEHOLDER",
+	button1 = "Close",
+	OnAccept = function(...) end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3, -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
+	OnShow =
+		function(self, data)
+			self.text:SetText("Do you want to create a Github issue to support the spell " ..
+				data.NameWithoutRank ..
+				"?\n\nCopy the link and paste it in your browser for a prefilled issue to submit.")
+			local title = "Support new spell " .. data.NameWithoutRank
+			local body = string.format([[
+Hello, this spell is ignored but I think it should be supported.
+
+Spell info is as follows:
+Spell name: `%s`
+Spell ID: `%d`
+Player class: `%s`
+Spell description: `%s`
+]], data.NameWithoutRank, data.SpellID, data.PlayerClass, data.Description)
+			local url =
+				"https://github.com/haraldfw/wow-classic-hhe/issues/new?assignees=haraldfw&labels=ignored+spell" ..
+				"&title=" .. URLEncode(title) ..
+				"&body=" .. URLEncode(body)
+			self.editBox:SetText(url)
+			self.editBox:HighlightText()
+		end,
+	hasEditBox = true
+}
+
 local function newOnEnter(spellID)
 	return function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -82,35 +115,14 @@ local function newOnLeave(spellID)
 end
 
 
-local function newDescriptionBoxWriter(spellName, desc, toChain)
+local function newIgnoredSpellOnClick(spellData)
 	return function(...)
-		if HHEDevEditBox == nil then
-			HHEDevEditBox = CreateFrame("EditBox", "HHEDevEditBox", HHEFrame)
-			HHEDevEditBox:SetFontObject(GameFontNormal)
-			HHEDevEditBox:SetSize(190, 24)
-			HHEDevEditBox:SetJustifyH("CENTER")
-			HHEDevEditBox:SetPoint("BOTTOMRIGHT", HHEFrame, "TOPRIGHT")
-			HHEDevEditBox:SetMultiLine(false)
-			HHEDevEditBox:SetScript("OnEscapePressed", function(self)
-				self:ClearFocus()
-				self:Hide()
-			end)
-		elseif not HHEDevEditBox:IsShown() then
-			HHEDevEditBox:Show()
-		end
-		HHEDevEditBox:SetText(spellName .. ": " .. desc)
-		if toChain ~= nil then
-			toChain(...)
-		end
+		StaticPopup_Show("HHE_IGNORED_SPELL_CREATE_ISSUE", "", "", spellData)
 	end
 end
 
 local function overwriteRow(row, data)
 	local i = 0
-	if HHEDebug then
-		row:SetScript("OnClick",
-			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
-	end
 	for _, cellInfo in pairs(cellInfos) do
 		i = i + 1
 		local cell = row.columns[i]
@@ -134,10 +146,6 @@ local function createRow(parent, data, index)
 	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -(index - 1) * CELL_HEIGHT)
 	row.columns = {}
 	local prevCell = nil
-	if HHEDebug then
-		row:SetScript("OnClick",
-			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
-	end
 
 	for i, cellInfo in pairs(cellInfos) do
 		local cell;
@@ -175,6 +183,8 @@ local function createIgnoredSpellRow(parent, data, index)
 	local row = CreateFrame("Button", "HHEIgnoredSpellsScrollFrameRow" .. tostring(index), parent)
 	row:SetSize(HHE_IGNORED_TABLE_ROW_WIDTH, CELL_HEIGHT)
 	row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -(index - 1) * CELL_HEIGHT)
+	row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
+	row:SetScript("OnClick", newIgnoredSpellOnClick(data))
 	row.columns = {}
 
 	local ci = cellInfoMap.Icon
@@ -184,10 +194,6 @@ local function createIgnoredSpellRow(parent, data, index)
 	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
 	iconCell:SetPoint("TOPLEFT", row, "TOPLEFT")
-	if HHEDebug then
-		row:SetScript("OnClick",
-			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
-	end
 	row.columns[1] = iconCell
 	iconCell:Show()
 
@@ -205,14 +211,12 @@ local function createIgnoredSpellRow(parent, data, index)
 end
 
 local function overwriteIgnoredSpellRow(row, data)
+	row:SetScript("OnClick", newIgnoredSpellOnClick(data))
+
 	local iconCell = row.columns[1]
 	iconCell:SetTexture(data.Icon)
 	iconCell:SetScript("OnEnter", newOnEnter(data.SpellID))
 	iconCell:SetScript("OnLeave", newOnLeave(data.SpellID))
-	if HHEDebug then
-		row:SetScript("OnClick",
-			newDescriptionBoxWriter(data.NameWithoutRank, data.Description))
-	end
 
 	local nameCell = row.columns[2]
 	nameCell:SetText(data.Name)

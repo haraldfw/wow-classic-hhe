@@ -18,24 +18,21 @@ local parsers = {
 	["DRUID"] = DruidParsers,
 }
 
-local function parseSpell(spellID, playerMaxMana)
+local function parseSpell(spellID, spellName, castingTimeMS, playerMaxMana, playerClass)
 	local desc = GetSpellDescription(spellID)
-	local playerClass, _ = UnitClassBase("player")
 	local spellParsers = parsers[playerClass]
 	if spellParsers == nil then
 		print("no parsers found for class: " .. playerClass)
 		return {
-			IsHealSpell = false,
+			Ignore = true,
 			Description = desc,
 		}
 	end
 
-
-	local spellName, _, icon, castingTimeMS, _, _, _ = GetSpellInfo(spellID)
 	local parseFunc = spellParsers[spellName]
 	if parseFunc == nil then
 		return {
-			IsHealSpell = false,
+			Ignore = true,
 			Description = desc,
 		}
 	end
@@ -44,7 +41,7 @@ local function parseSpell(spellID, playerMaxMana)
 	if avg == nil then
 		-- current spellID is not a healing/shield spell
 		return {
-			IsHealSpell = false,
+			Ignore = true,
 			Description = desc,
 		}
 	end
@@ -95,7 +92,7 @@ local function parseSpell(spellID, playerMaxMana)
 	end
 
 	return {
-		IsHealSpell = true,
+		Ignore = false,
 		Description = desc,
 		Average = avg.Average or 0,
 		HotSeconds = avg.HOTSeconds or 0,
@@ -103,7 +100,6 @@ local function parseSpell(spellID, playerMaxMana)
 		IsGroupHeal = avg.OptimisticNumberOfTargets > 1 and "Yes" or "No",
 		CastingTime = castTime or 0,
 		Cost = cost or 0,
-		Icon = icon,
 		Efficiency = efficiency or 0,
 		GlobalCooldown = globalCooldown,
 		HealPerSecond = healPerSecond or 0,
@@ -119,18 +115,19 @@ function ParseSpellBook()
 		local offset, numSlots = select(3, GetSpellTabInfo(i))
 		for j = offset + 1, offset + numSlots do
 			local name, rank, spellID = GetSpellBookItemName(j, BOOKTYPE_SPELL)
-			local spellInfo = parseSpell(spellID, playerMaxMana)
+			local spellName, _, icon, castingTimeMS, _, _, _ = GetSpellInfo(spellID)
+			local spellInfo = parseSpell(spellID, spellName, castingTimeMS, playerMaxMana, playerClass)
 			spellInfo.SpellID = spellID
 			spellInfo.Name = name
 			spellInfo.NameWithoutRank = name
+			spellInfo.Icon = icon
+			spellInfo.PlayerClass = playerClass
 			if rank ~= nil then
 				spellInfo.Name = spellInfo.Name .. " " .. rank
 			end
-			if spellInfo.IsHealSpell then
+			if not spellInfo.Ignore then
 				table.insert(spells, spellInfo)
 			else
-				local _, _, icon, _, _, _, _ = GetSpellInfo(spellID)
-				spellInfo.Icon = icon
 				table.insert(ignoredSpells, spellInfo)
 			end
 		end
