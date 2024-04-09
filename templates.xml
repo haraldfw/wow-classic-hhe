@@ -131,6 +131,7 @@
 				tinsert(UISpecialFrames, "HHEFrame")
 			</OnLoad>
 			<OnShow>
+				DebugDump({"HHETABLE_ROW_WIDTH", HHETABLE_ROW_WIDTH})
 				HHEFrame_OnShow(self);
 			</OnShow>
 			<OnHide>
@@ -147,8 +148,10 @@
 				<Scripts>
 					<OnClick>
 						if ( HHEIgnoredSpellsInfoFrame:IsShown() ) then
+							self:SetText("Show ignored spells")
 							HHEIgnoredSpellsInfoFrame:Hide()
 						else
+							self:SetText("Hide ignored spells")
 							ShowHHEIgnoredSpellsFrame()
 						end
 					</OnClick>

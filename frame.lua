@@ -84,7 +84,7 @@ StaticPopupDialogs["HHE_IGNORED_SPELL_CREATE_ISSUE"] = {
 			local body = string.format([[
 Hello, this spell is ignored but I think it should be supported.
 
-Spell info is as follows:
+## Spell info
 Spell name: `%s`
 Spell ID: `%d`
 Player class: `%s`

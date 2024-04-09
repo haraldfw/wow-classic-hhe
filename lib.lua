@@ -13,3 +13,22 @@ function URLEncode(url)
 	url = url:gsub(" ", "+")
 	return url
 end
+
+function DebugDump(...)
+	if HHEDebug then
+		Dump(...)
+	end
+end
+
+function Dump(...)
+	if ... == nil then
+		return
+	end
+	if type(...) == "table" then
+		for k, v in pairs(...) do
+			print(tostring(k) .. ": " .. tostring(v))
+		end
+	else
+		print(tostring(...))
+	end
+end
