@@ -159,6 +159,35 @@
 				<NormalFont style="GameFontNormalSmall"/>
 				<HighlightFont style="GameFontHighlightSmall"/>
 			</Button>
+			<CheckButton name="HHEShowAllSpellRanksCheckBox" inherits="OptionsSmallCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="26" y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" x="58" y="-22"/>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."Text"]:SetText(SHOW_ALL_SPELL_RANKS)
+					</OnLoad>
+					<OnShow>
+						self:SetChecked( GetCVarBool("ShowAllSpellRanks") )
+					</OnShow>
+					<OnClick>
+						SetCVar("ShowAllSpellRanks", self:GetChecked())
+						ShowAllSpellRanksCheckBox:SetChecked(self:GetChecked())
+						if ShowAllSpellRanksCheckBox:IsShown() then
+							SpellBookFrame_UpdatePages()
+							SpellBookFrame_UpdateSpells()
+						end
+						HHE_UpdateData()
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+					</OnClick>
+				</Scripts>
+			</CheckButton>
 			<Button name="HHEFrameColumnHeaderIcon" inherits="HHEColumnHeaderTemplate" text="I">
 				<Anchors>
 					<Anchor point="TOPLEFT" x="7" y="-57"/>

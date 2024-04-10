@@ -328,7 +328,7 @@ local function updateRenderedIgnoredSpells()
 	child:Show()
 end
 
-local function updateData()
+function HHE_UpdateData()
 	spellDatas, ignoredSpellDatas = ParseSpellBook()
 	sortData()
 	updateRenderedData()
@@ -390,7 +390,7 @@ function HHEHandleCommand(arg)
 end
 
 function ShowHHEFrame()
-	updateData()
+	HHE_UpdateData()
 	HHEFrame:Show()
 end
 
@@ -434,6 +434,6 @@ function HHEFrame_OnEvent(self, event, ...)
 			ShowHHEFrame()
 		end
 	elseif event == "SPELLS_CHANGED" then
-		updateData()
+		HHE_UpdateData()
 	end
 end
